@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Mice</title>
+    <title>Mice-R</title>
     <style>
       body {
   font-family: Arial, sans-serif;
   padding: 2em;
-  background: url('https://skaberson.github.io/Terrandia/images/foresta.png') repeat-x;
-  background-size: cover;
-  animation: scrollBackground 30s linear infinite;
-  overflow-x: hidden; /* prevent horizontal scroll */
+  margin: 0;
+  height: 100vh;
+  overflow-x: hidden;
+  background: #000;
+  position: relative;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  padding: 2em;
-  overflow-x: hidden;
-  margin: 0;
-  position: relative;
+/* Container for each parallax set */
+.parallax-set {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
   height: 100vh;
-  background: #000; /* fallback */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 3s ease;
+  z-index: -1;
+}
+.parallax-set.active {
+  opacity: 1;
+  z-index: 0;
 }
 
 /* Parallax layers */
@@ -32,40 +39,16 @@ body {
   background-position: 0 0;
   background-size: cover;
   pointer-events: none;
-  z-index: 0;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-name: scrollBackground;
 }
 
-.layer1 {
-  background-image: url('https://htmlcolorcodes.com/assets/images/colors/baby-blue-color-solid-background-1920x1080.png');
-  z-index: -1;
-  animation-duration: 0s;
-}
-
-.layer2 {
-  background-image: url('https://skaberson.github.io/Terrandia/images/foresta.png'); /* example */
-  z-index: 1;
-  animation-duration: 30s;
-  opacity: 1;
-}
-
-.layer3 {
-  background-image: url('https://skaberson.github.io/Terrandia/images/forestb.png'); /* example */
-  z-index: 2;
-  animation-duration: 20s;
-  opacity: 1;
-}
-
-.layer4 {
-  background-image: url('https://skaberson.github.io/Terrandia/images/clouds3.png'); /* example */
-  z-index: 0;
-  animation-duration: 40s;
-  opacity: 1;
-}
-
-
+/* Layers default durations and z-index within each set */
+.layer1 { animation-duration: 30s; z-index: 1; }
+.layer2 { animation-duration: 20s; z-index: 2; }
+.layer3 { animation-duration: 15s; z-index: 3; }
+.layer4 { animation-duration: 25s; z-index: 0; }
 
 @keyframes scrollBackground {
   from {
@@ -76,72 +59,263 @@ body {
   }
 }
 
-/* Update login-box to be above layers */
+/* Popup styling */
+.popup {
+  position: fixed;
+  z-index: 100;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+
+  /* Center popup content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content {
+  background: none;    /* remove background */
+  padding: 0;
+  border-radius: 0;
+  max-width: none;
+  width: auto;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#infoPopup .popup-content {
+  background: white;
+  width: 50%;
+  max-width: 600px; /* optional max-width for better control */
+  padding: 2em;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+
+.close {
+  position: absolute;
+  top: 0.5em;
+  right: 1em;
+  font-size: 2em;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Buttons container: horizontal flex with spacing */
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 10em;
+  z-index: 20;
+  position: relative;
+}
+
+/* Square emoji-only buttons */
+.buttons-container button {
+  width: 100px;         /* smaller squares */
+  height: 100px;
+  font-size: 2em;
+  padding: 0;
+  border-radius: 10px;
+  background: #007bff;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttons-container button:hover {
+  background: #0056b3;
+}
+
+/* Login box adjustments inside popup */
 .login-box {
   position: relative;
   z-index: 10;
   background: white;
-  max-width: 320px;
-  margin: auto;
+  max-width: 250px;
+  margin: 0 auto;
   padding: 2em;
-  top: 20%
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   border-radius: 5px;
+  box-sizing: border-box;
 }
 
-      input[type=text], input[type=password] {
-        width: 100%;
-        padding: 0.5em;
-        margin: 0.5em 0 1em 0;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-      }
-      button {
-        width: 100%;
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 0.7em;
-        font-size: 1em;
-        border-radius: 3px;
-        cursor: pointer;
-      }
-      button:hover {
-        background: #0056b3;
-      }
-      .error {
-        color: red;
-        margin-bottom: 1em;
-        text-align: center;
-      }
+button.login-submit {
+  width: 100%;
+  background: white;
+  color: #007bff;
+  border: 3px solid #007bff; /* thick blue border */
+  border-radius: 12px;       /* same rounded corners as inputs */
+  padding: 0.5em;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+button.login-submit:hover {
+  background: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 0.5em;
+  margin: 0.5em 0 1em 0;
+  border: 3px solid #007bff;  /* thick border with button blue color */
+  border-radius: 12px;         /* rounded corners */
+  box-sizing: border-box;
+  outline: none;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+  border-color: #0056b3;      /* darker blue on focus */
+}
+
+
+button.login-submit {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.7em;
+  font-size: 1em;
+  border-radius: 3px;
+  cursor: pointer;
+}
+button.login-submit:hover {
+  background: #0056b3;
+}
+
+.error {
+  color: red;
+  margin-bottom: 1em;
+  text-align: center;
+}
+
     </style>
   </head>
   <body>
-  <div class="parallax-layer layer1"></div>
-  <div class="parallax-layer layer2"></div>
-  <div class="parallax-layer layer3"></div>
-  <div class="parallax-layer layer4"></div>
+    
+    
+    <div id="startup-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;color:#fff;font-family:sans-serif;font-size:2em;">
+  <div id="loading-text">Loading...</div>
+  <div id="loading-bar" style="margin-top:20px;width:300px;height:10px;background:#555;border-radius:5px;overflow:hidden;">
+    <div id="loading-progress" style="width:0%;height:100%;background:#00f;"></div>
+  </div>
+</div>
 
-  <div class="login-box">
-    <h2>Log-in to Mice-R</h2>
-    <div id="error-msg" class="error"></div>
-    <input id="username" type="text" placeholder="Username" />
-    <input id="password" type="password" placeholder="Password" />
-    <button onclick="login()">Submit</button>
+<!-- Hidden preload container -->
+<div id="preload-images" style="display:none;">
+  <img src="https://htmlcolorcodes.com/assets/images/colors/baby-blue-color-solid-background-1920x1080.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/foresta.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/forestb.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/clouds3.png" />
+  <img src="https://today.uconn.edu/wp-content/uploads/2019/05/STSCI-H-p1917b-q-5198x4801_NASAimage_horizontalcrop.jpg" />
+  <img src="https://skaberson.github.io/Terrandia/images/earth.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/asteroids.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/pumpmoon.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/pumpmoonc.png" />
+  <img src="https://skaberson.github.io/Terrandia/images/pumpmoonb.png" />
+</div>
+
+
+    <!-- Parallax background set 1 -->
+    <div class="parallax-set active" id="set1">
+      <div class="parallax-layer layer1" style="background-image: url('https://htmlcolorcodes.com/assets/images/colors/baby-blue-color-solid-background-1920x1080.png');"></div>
+      <div class="parallax-layer layer2" style="background-image: url('https://skaberson.github.io/Terrandia/images/foresta.png');"></div>
+      <div class="parallax-layer layer3" style="background-image: url('https://skaberson.github.io/Terrandia/images/forestb.png');"></div>
+      <div class="parallax-layer layer4" style="background-image: url('https://skaberson.github.io/Terrandia/images/clouds3.png'); opacity: 0.7;"></div>
+    </div>
+
+    <!-- Parallax background set 2 -->
+    <div class="parallax-set" id="set2">
+      <div class="parallax-layer layer1" style="background-image: url('https://today.uconn.edu/wp-content/uploads/2019/05/STSCI-H-p1917b-q-5198x4801_NASAimage_horizontalcrop.jpg'); animation-duration: 40s;"></div>
+      <div class="parallax-layer layer3" style="background-image: url('https://skaberson.github.io/Terrandia/images/earth.png'); animation-duration: 0s; opacity: 1;"></div>
+      <div class="parallax-layer layer2" style="background-image: url('https://skaberson.github.io/Terrandia/images/asteroids.png'); animation-duration: 30s; opacity: 1;"></div>
+      <div class="parallax-layer layer4" style="background-image: url('https://skaberson.github.io/Terrandia/images/foresta.png'); animation-duration: 20s; opacity: 0;"></div>
+    </div>
+
+    <!-- Parallax background set 3 -->
+    <div class="parallax-set" id="set3">
+      <div class="parallax-layer layer1" style="background-image: url('https://htmlcolorcodes.com/assets/images/colors/lightgreen-color-solid-background-1920x1080.png'); animation-duration: 25s;"></div>
+      <div class="parallax-layer layer2" style="background-image: url('https://skaberson.github.io/Terrandia/images/pumpmoon.png'); animation-duration: 0s; opacity: 1;"></div>
+      <div class="parallax-layer layer3" style="background-image: url('https://skaberson.github.io/Terrandia/images/pumpmoonc.png'); animation-duration: 30; opacity: 1;"></div>
+      <div class="parallax-layer layer4" style="background-image: url('https://skaberson.github.io/Terrandia/images/pumpmoonb.png'); animation-duration: 15s; opacity: 1;"></div>
+    </div>
+    
+
+    <!-- Buttons container -->
+  <div class="buttons-container">
+  <button title="Login" onclick="showPopup('loginPopup')">🔒
+  Log In</button>
+  <button title="Sign Up" onclick="showPopup('signupPopup')">📝 
+  Signup</button>
+  <button title="Info" onclick="showPopup('infoPopup')">🔍
+  About</button>
+</div>
+
+
+  <!-- Login Popup -->
+  <div id="loginPopup" class="popup" style="display:none;">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup('loginPopup')">&times;</span>
+      <div class="login-box" style="position:static; box-shadow:none; background:none; max-width:none; padding:0;">
+        <img src="https://raw.githubusercontent.com/Skaberson/mice/main/images/mice.png" alt="Mice-R Logo" style="display:block; margin: 0 auto 1em auto;">
+        <div id="error-msg" class="error"></div>
+        <input id="username" type="text" placeholder="Username" />
+        <input id="password" type="password" placeholder="Password" />
+        <button class="login-submit" onclick="login()">Submit</button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign Up Popup with iframe -->
+  <div id="signupPopup" class="popup" style="display:none;">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup('signupPopup')">&times;</span>
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSf6Ax3iMI6SS3-8ws9Zgd44sKp9QwUziuMDwxHSK74LNkkqBg/viewform?usp=dialog" style="width: 100%; height: 800px;" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- Info Popup -->
+  <div id="infoPopup" class="popup" style="display:none;">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup('infoPopup')">&times;</span>
+      <h2>Terms of Service</h2>
+      <p>Any mentions of "us" "we" or "mice" refer to the council</p>
+    </div>
   </div>
 
     <script>
       // Hardcoded users with passwords and redirect URLs
       const users = {
         'public': { password: 'miceforlife123', redirect: 'https://sites.google.com/student.cms.k12.nc.us/mice/home' },
-        '3546983238': { password: '123eyesonme', redirect: 'https://sites.google.com/student.cms.k12.nc.us/mice/3546983238' },
+        'alvin': { password: '', redirect: 'https://sites.google.com/student.cms.k12.nc.us/mice/3546983238' },
+        '4425466179': { password: 'oligarch #1', redirect: 'https://sites.google.com/student.cms.k12.nc.us/mice/pminister1' },
         '4425466179': { password: 'oligarch #1', redirect: 'https://sites.google.com/student.cms.k12.nc.us/mice/pminister1' }
       };
 
       function login() {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
-
         const errorMsg = document.getElementById('error-msg');
         errorMsg.textContent = '';
 
@@ -151,14 +325,81 @@ body {
         }
 
         if(users[username] && users[username].password === password) {
-          // Redirect to user specific page
+          // Redirect user
           window.location.href = users[username].redirect;
-
-
         } else {
           errorMsg.textContent = 'Invalid username or password.';
         }
       }
+      
+    // Preload images from #preload-images
+const preloadImgs = document.querySelectorAll('#preload-images img');
+const totalImgs = preloadImgs.length;
+let loadedImgs = 0;
+
+function updateProgress() {
+  const percent = Math.floor((loadedImgs / totalImgs) * 99);
+  document.getElementById('loading-progress').style.width = percent + '%';
+  document.getElementById('loading-text').textContent = `Loading... ${percent}%`;
+}
+
+preloadImgs.forEach(img => {
+  if (img.complete) {
+    loadedImgs++;
+    updateProgress();
+  } else {
+    img.addEventListener('load', () => {
+      loadedImgs++;
+      updateProgress();
+      if (loadedImgs === totalImgs) finishLoading();
+    });
+    img.addEventListener('error', () => {
+      loadedImgs++;
+      updateProgress();
+      if (loadedImgs === totalImgs) finishLoading();
+    });
+  }
+});
+
+if (loadedImgs === totalImgs) {
+  finishLoading();
+}
+
+function finishLoading() {
+  // Animate overlay fade out
+  const overlay = document.getElementById('startup-overlay');
+  overlay.style.transition = 'opacity 1.5s ease';
+  overlay.style.opacity = 0;
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 1500);
+}
+
+      
+    function showPopup(id) {
+      document.getElementById(id).style.display = 'block';
+    }
+    function closePopup(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+      // Parallax sets fade cycling every 30 seconds
+      const sets = document.querySelectorAll('.parallax-set');
+      let current = 0;
+      const fadeDuration = 3000; // 3 seconds fade
+      // Parallax sets fade cycling every 30 seconds
+const visibleDuration = 4000; // 10 seconds visible time
+
+
+      function fadeToNextSet() {
+        const prev = current;
+        current = (current + 1) % sets.length;
+
+        sets[prev].classList.remove('active');
+        sets[current].classList.add('active');
+      }
+
+      setInterval(fadeToNextSet, visibleDuration);
     </script>
   </body>
 </html>
